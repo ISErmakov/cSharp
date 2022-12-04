@@ -14,7 +14,7 @@ if (number % 2 == 0)
 {
     Console.WriteLine("Yes, the number is even");
 }
-else 
+else
 {
     Console.WriteLine("No, the number is not even");
 }
