@@ -11,9 +11,12 @@
 
 Console.WriteLine("Please, enter the number");
 int number = Convert.ToInt32(Console.ReadLine());
-if (Math.Abs(number) >= 100)
+int NextNumber = Math.Abs(number);
+
+if (NextNumber >= 100)
 {
-    int thirdDigit = (Math.Abs(number) / 100) % 10;
+    while (NextNumber >= 1000) NextNumber /= 10;
+    int thirdDigit = NextNumber % 10;
     Console.WriteLine(thirdDigit);
 }
 else 
