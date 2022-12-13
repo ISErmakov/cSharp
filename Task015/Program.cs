@@ -18,27 +18,19 @@ string isWeekend(int x)
     {
         case 1:
             return "No, Monday is not a weekend";
-            break;
         case 2:
             return "No, Tuesday is not a weekend";
-            break;
         case 3:
             return "No, Wednesday is not weekend";
-            break;
         case 4:
             return "No, Thursday is not weekend";
-            break;
         case 5:
             return "No, Friday is not weekend";
-            break;
         case 6:
             return "Yes, Saturday is weekend";
-            break;
         case 7:
             return "Yes, Sunday is weekend";
-            break;
         default:
             return "The day of week with this number does not exist";
-            break;
     }
 }
