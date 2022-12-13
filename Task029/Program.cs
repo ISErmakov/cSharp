@@ -7,12 +7,19 @@
 Console.Clear();
 
 int len = 8;
-int[] array = new int[len];
-Random rnd = new Random();
 
-for (int i = 0; i < len; i++)
+int[] CreateArray(int let)
 {
-    array[i] = Convert.ToInt32(rnd.Next(0,100));
+    int[] array = new int[len];
+    Random rnd = new Random();
+    for (int i = 0; i < len; i++)
+        {
+        array[i] = Convert.ToInt32(rnd.Next(0,100));
+        }
+    return array;
 }
 
-Console.WriteLine(String.Join(" ", array));
+int[]A = CreateArray(len);
+
+
+Console.WriteLine(String.Join(" ", A));
