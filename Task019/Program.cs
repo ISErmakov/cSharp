@@ -35,7 +35,7 @@ bool IsPolyndrome (int number)
     {
         polyNumber = polyNumber * 10 + number % 10;
         number = number / 10;
-    }
+    }     
     return polyNumber == rightNumber;
 }
 
