@@ -1,6 +1,17 @@
 ﻿/*Игра в тетрис*/
 
-//Вывод экрана
+// TODO экран тетриса окружен 1 по периметру, движение фигуры вправо влево вниз.
+// Пробуем передвинуть подматрицу на экране. (методы впарво влево вниз, поворот) 
+// (метод проверки) Если нет противоречий(пересечений) с границей и двугими элементами, то значит двигать можно, иначе нельзя.
+// Если нельзя двинуться вниз, то вводим новую фигуру (метод новая фигура).
+// Объект фигура 5 штук линия квадрат буква г зиг заг и три лучник
+//  ****   **    *      *    **
+//         **    ***   ***    **
+//  - у каждой фигуры 4 варианта разворота. (у линии - 2 у квадрата - 1)
+// Проверка перед вводом новой фигуры. Если не проходит - конец игры.
+// Перед новой фигурой - Если собрана строка - то экран вниз сдвинуть (функция сдвинуть). 
+
+// Вывод экрана.
 void PrintScreen(int[,] screen)
 {
     Console.Clear();
@@ -14,7 +25,7 @@ for (int i = 0; i < screen.GetLength(0)-1; i++)
     }
 }
 
-//Новая фигура сверху
+// Новая фигура сверху.
 (int[,], int, int) NewFigure(int[,] array)
 {
     Random rnd = new Random();
@@ -25,7 +36,7 @@ for (int i = 0; i < screen.GetLength(0)-1; i++)
     return (array, x, y);
 }
 
-//шаг влево
+// Шаг влево.
 (int, int) TurnLeft(int[,] array, int x, int y)
 {
     array[x, y] = 0;
@@ -34,7 +45,7 @@ for (int i = 0; i < screen.GetLength(0)-1; i++)
     return (x, y - 1);
 }
 
-//шаг вправо
+// Шаг вправо.
 (int, int) TurnRight(int[,] array, int x, int y)
 {
     array[x, y] = 0;
@@ -43,7 +54,7 @@ for (int i = 0; i < screen.GetLength(0)-1; i++)
     return (x, y + 1);
 }
 
-//шаг вниз
+// Шаг вниз.
 (int, int) TurnDown(int[,] array, int x, int y)
 {
     array[x, y] = 0;
@@ -52,7 +63,7 @@ for (int i = 0; i < screen.GetLength(0)-1; i++)
     return (x + 1, y);
 }
 
-//Проверка на полную строку
+// Проверка на полную строку.
 bool IsFull(int [,] array)
 {
     for (int j = 0; j < array.GetLength(1); j++)
@@ -71,30 +82,35 @@ bool IsFull(int [,] array)
 
 Console.Clear();
 
-//Инициализация экрана тетриса. Посленняя строка заполняется 1 - нижняя граница.
+// Инициализация экрана тетриса. Посленняя строка заполняется 1 - нижняя граница.
 int[,] screen = new int[14,10];
-int x, y = 0; //координаты фигуры
-ConsoleKeyInfo key;
+int x, y = 0; // Координаты фигуры (верхняя левая точка)
+
 for (int j = 0; j < screen.GetLength(1); j++)
 {
     screen[screen.GetLength(0) - 1, j] = 1;
 }
 
-//Начинаем игру
+// Начинаем игру
 (screen, x, y) = NewFigure(screen);
 
+ConsoleKeyInfo key;
 do
 {
     key = Console.ReadKey();
     switch (key.Key)
     {
         case ConsoleKey.LeftArrow  : (x, y) = TurnLeft(screen, x, y);
+        break;
         case ConsoleKey.RightArrow : (x, y) = TurnRight(screen, x, y);
+        break;
         case ConsoleKey.DownArrow  : (x, y) = TurnDown(screen, x, y);
+        break;
     }  
+
     if (screen[x + 1, y] == 1)
         {
-            if (IsFull(screen));
+            IsFull(screen);
             (screen, x, y) = NewFigure(screen);
         }
 } while (key.Key != ConsoleKey.Escape);
