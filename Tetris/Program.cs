@@ -14,17 +14,18 @@
 // Вывод экрана.
 void PrintScreen(int[,] screen)
 {
-    Console.Clear();
-for (int i = 0; i < screen.GetLength(0)-1; i++)
-    {
-        for (int j = 0; j < screen.GetLength(1); j++)
+    //Console.Clear();
+    for (int i = 0; i < screen.GetLength(0); i++)
         {
-            Console.Write(screen[i,j]+ " ");
-        }
-        Console.WriteLine();
+            for (int j = 0; j < screen.GetLength(1); j++)
+            {
+                if (screen[i,j] == 0) Console.Write("  ");
+                else Console.Write(screen[i,j]+ " ");
+            }
+            Console.WriteLine();
     }
 }
-
+/*
 // Новая фигура сверху.
 (int[,], int, int) NewFigure(int[,] array)
 {
@@ -35,82 +36,401 @@ for (int i = 0; i < screen.GetLength(0)-1; i++)
     PrintScreen(array);
     return (array, x, y);
 }
+*/
 
-// Шаг влево.
-(int, int) TurnLeft(int[,] array, int x, int y)
-{
-    array[x, y] = 0;
-    array[x, y - 1] = 1;
-    PrintScreen(array);
-    return (x, y - 1);
-}
+ int[,,] f = new int[8,4,4];
+    // *
+    // * * *
+    f[0, 0, 0] = 1; f[0, 1, 0] = 1; f[0, 1, 1] = 1; f[0, 1, 2] = 1;
+    // * *
+    // *
+    // *
+    f[1, 0, 0] = 1; f[1, 0, 1] = 1; f[1, 1, 0] = 1; f[1, 2, 0] = 1;
+    // * * *
+    //     *
+    f[2, 0, 0] = 1; f[2, 0, 1] = 1; f[2, 0, 2] = 1; f[2, 1, 2] = 1;
+    //   *
+    //   *
+    // * *
+    f[3, 0, 1] = 1; f[3, 1, 1] = 1; f[3, 2, 0] = 1; f[3, 2, 1] = 1;
+    // * *
+    // * *
+    f[4, 0, 0] = 1; f[4, 0, 1] = 1; f[4, 1, 0] = 1; f[4, 1, 1] = 1;
+    f[5, 0, 0] = 1; f[5, 0, 1] = 1; f[5, 1, 0] = 1; f[5, 1, 1] = 1;
+    f[6, 0, 0] = 1; f[6, 0, 1] = 1; f[6, 1, 0] = 1; f[6, 1, 1] = 1;
+    f[7, 0, 0] = 1; f[7, 0, 1] = 1; f[7, 1, 0] = 1; f[7, 1, 1] = 1;
 
-// Шаг вправо.
-(int, int) TurnRight(int[,] array, int x, int y)
-{
-    array[x, y] = 0;
-    array[x, y + 1] = 1;
-    PrintScreen(array);
-    return (x, y + 1);
-}
 
-// Шаг вниз.
-(int, int) TurnDown(int[,] array, int x, int y)
+(int[,], int, int, int) NewFigure1(int[,] array)
 {
-    array[x, y] = 0;
-    array[x + 1, y] = 1;
-    PrintScreen(array);
-    return (x + 1, y);
-}
+    int x = 0;
+    int y = array.GetLength(1) / 2;
 
-// Проверка на полную строку.
-bool IsFull(int [,] array)
-{
-    for (int j = 0; j < array.GetLength(1); j++)
+    Random rnd = new Random();
+    int fig = rnd.Next(0,8);
+
+    //TODO проверка на печать без сдвига. Если невозможна - то конец игры, иначе делаем экран с новой фигурой.
+    for (int i = 0; i < f.GetLength(1); i++)
     {
-        if (array[array.GetLength(0)-2,j] == 0) return false;
+        for (int j = 0; j < f.GetLength(2); j++)
+        {
+            array[x+i,y+j] = f[fig,i,j];
+        }
     }
-    for (int i = array.GetLength(0)-1; i > 1; i--)
+    PrintScreen(array);
+    return(array, x, y, fig+1); //TODO убрать fig+1
+}
+
+bool CanTurn(int[,] array, int x, int y, int fig, int turn) //Добавить вниз поворот
+{
+    int[,] arrayTemp = new int[array.GetLength(0),array.GetLength(1)];
+    for (int i = 0; i < array.GetLength(0); i++)
     {
         for (int j = 0; j < array.GetLength(1); j++)
         {
-            array[i, j] = array[i - 1, j];
+            arrayTemp[i,j] = array[i,j];
+        }
+    }
+
+// Влево
+    if (turn == 1)
+    {
+        for (int i = 0; i < f.GetLength(1); i++)
+        {
+            for (int j = 0; j < f.GetLength(2); j++)      
+            {
+                arrayTemp[x+i,y+j] -= f[fig,i,j];
+                arrayTemp[x+i,y+j-1] += f[fig,i,j];
+                if (arrayTemp[x+i,y+j-1] == 2) return false;
+            }
+        }
+    }
+
+// Вправо
+    if (turn == 2)
+    {
+        for (int i = 0; i < f.GetLength(1); i++)
+        {
+            for (int j = 0; j < f.GetLength(2); j++)      
+            {
+                arrayTemp[x+i,y+j] -= f[fig,i,j];
+                arrayTemp[x+i,y+j+1] += f[fig,i,j];
+                Console.Write(arrayTemp[x+i,y+j]); //ТУТ ГДЕ ТО ОШИБКА НУЖНА БУМАЖКА
+                //if (arrayTemp[x+i,y+j+1] == 2) return false;
+            }
+            Console.WriteLine();
         }
     }
     return true;
 }
 
+// Шаг влево.
+(int, int) TurnLeft(int[,] array, int x, int y, int fig)
+{
+    if (CanTurn(array, x, y, fig - 1, 1))
+    {
+        for (int i = 0; i < f.GetLength(1); i++)
+        {
+            for (int j = 0; j < f.GetLength(2); j++)      
+            {
+                array[x+i,y+j] -= f[fig-1,i,j];
+                array[x+i,y+j-1] += f[fig-1,i,j];
+            }
+        }
+        PrintScreen(array);
+        return(x, y-1);
+    }
+    else return(x,y);
+/*
+    switch (fig)
+    {
+        case 1:
+            if (array[x, y-1] == 1 || array[x+1, y-1] == 1) return (x,y);
+            array[x, y] = 0;                                            //      *
+            array[x+1, y] = 0; array[x+1,y+1] = 0; array[x+1,y+2] = 0;  //      * * *
+            array[x, y-1] = 1;
+            array[x+1, y-1] = 1; array[x+1,y] = 1; array[x+1,y+1] = 1;
+            PrintScreen(array);
+            return (x, y - 1);
+        case 2:
+            if (array[x, y-1] == 1 || array[x+1, y-1] == 1 || array[x+2, y-1] == 1) return (x,y);
+            array[x, y] = 0; array[x, y+1] = 0;                         //      * *
+            array[x+1,y] = 0;                                           //      *
+            array[x+2,y] = 0;                                           //      *
+            array[x, y-1] = 1; array[x, y] = 1;
+            array[x+1,y-1] = 1; 
+            array[x+2,y-1] = 1;
+            PrintScreen(array);
+            return (x, y - 1);
+        case 3:
+            if (array[x, y-1] == 1 || array[x+1, y+1] == 1) return (x,y);
+            array[x, y] = 0; array[x, y+1] = 0; array[x,y+2] = 0;       //      * * *
+                                                array[x+1,y+2] = 0;     //          *
+            array[x, y-1] = 1; array[x, y] = 1; array[x,y+1] = 1; 
+                                                array[x+1,y+1] = 1;
+            PrintScreen(array);
+            return (x, y - 1);
+        case 4:
+            if (array[x, y] == 1 || array[x+1, y] == 1 || array[x+2, y-1] == 1) return (x,y);
+                              array[x, y+1] = 0;                        //          *
+                              array[x+1, y+1] = 0;                      //          *  
+            array[x+2,y] = 0; array[x+2,y+1] = 0;                       //        * *
+                              array[x, y] = 1; 
+                              array[x+1, y] = 1; 
+            array[x+2,y-1] = 1; array[x+2,y] = 1;
+            PrintScreen(array);
+            return (x, y - 1);
+        default:
+            return(x,y);
+    }
+    */
+    
+}
+
+// Шаг вправо.
+(int, int) TurnRight(int[,] array, int x, int y, int fig)
+{
+    if (CanTurn(array, x, y, fig - 1, 2))
+    {
+        for (int i = 0; i < f.GetLength(1); i++)
+        {
+            for (int j = 0; j < f.GetLength(2); j++)      
+            {
+                //array[x+i,y+j] -= f[fig - 1,i,j];
+                //array[x+i,y+j+1] += f[fig-1,i,j];
+            }
+        }
+        PrintScreen(array);
+        return(x, y);
+    }
+    else return(x,y);
+
+    /*
+    switch (fig)
+    {
+        case 1:
+            if (array[x, y+1] == 1 || array[x+1, y+3] == 1) return (x,y);
+            array[x, y] = 0;                                                    //      *
+            array[x+1, y] = 0; array[x+1,y+1] = 0; array[x+1,y+2] = 0;          //      * * *
+            array[x, y+1] = 1; 
+            array[x+1, y+1] = 1; array[x+1,y+2] = 1; array[x+1,y+3] = 1;
+            PrintScreen(array);
+            return (x, y + 1);
+        case 2:
+            if (array[x, y+2] == 1 || array[x+1, y+1] == 1 || array[x+2, y+1] == 1) return (x,y);
+            array[x, y] = 0; array[x, y+1] = 0;                                 //      * *
+            array[x+1,y] = 0;                                                   //        *
+            array[x+2,y] = 0;                                                   //        *
+            array[x, y+1] = 1; array[x, y+2] = 1; 
+            array[x+1,y+1] = 1; 
+            array[x+2,y+1] = 1;
+            PrintScreen(array);
+            return (x, y + 1);
+        case 3:
+            if (array[x, y+3] == 1 || array[x+1, y+3] == 1) return (x,y);
+            array[x, y] = 0; array[x, y+1] = 0; array[x,y+2] = 0;          //   * * * 
+                                                array[x+1,y+2] = 0;        //       *
+            array[x, y+1] = 1; array[x, y+2] = 1; array[x,y+3] = 1; 
+                                                array[x+1,y+3] = 1;
+            PrintScreen(array);
+            return (x, y + 1);
+        case 4:
+            if (array[x, y+2] == 1 || array[x+1, y+2] == 1 || array[x+2, y+2] == 1) return (x,y);
+                              array[x, y+1] = 0;           //      *
+                              array[x+1, y+1] = 0;         //      *
+            array[x+2,y] = 0; array[x+2,y+1] = 0;          //    * *          
+                                array[x, y+2] = 1; 
+                                array[x+1, y+2] = 1; 
+            array[x+2,y+1] = 1; array[x+2,y+2] = 1;
+            PrintScreen(array);
+            return (x, y + 1);
+        default:
+            return(x,y);
+    }
+    */
+}
+
+// Шаг вниз.
+(int, int, bool) TurnDown(int[,] array, int x, int y, int fig)
+{    
+    switch (fig)
+    {
+        case 1:
+            if (array[x+2, y] == 1 || array[x+2, y+1] == 1 || array[x+2, y+2] == 1) return (x,y,true);
+            array[x, y] = 0;                                                //  *
+            array[x+1, y] = 0; array[x+1,y+1] = 0; array[x+1,y+2] = 0;      //  * * *
+            array[x+1, y] = 1; 
+            array[x+2, y] = 1; array[x+2,y+1] = 1; array[x+2,y+2] = 1;
+            PrintScreen(array);
+            return (x + 1, y, false);
+        case 2:
+            if (array[x+1, y+1] == 1 || array[x+3, y] == 1) return (x,y,true);
+            array[x, y] = 0; array[x, y+1] = 0;     //      * *
+            array[x+1,y] = 0;                       //      *
+            array[x+2,y] = 0;                       //      *
+            array[x+1, y] = 1; array[x+1, y+1] = 1;
+            array[x+2,y] = 1;
+            array[x+3,y] = 1;
+            PrintScreen(array);
+            return (x + 1, y, false);
+        case 3:
+            if (array[x+1, y] == 1 || array[x+1, y+1] == 1|| array[x+2, y+2] == 1) return (x,y,true);
+            array[x, y] = 0; array[x, y+1] = 0; array[x,y+2] = 0;       //      * * *
+                                                array[x+1,y+2] = 0;     //          *
+            array[x+1, y] = 1; array[x+1, y+1] = 1; array[x+1,y+2] = 1;
+                                                    array[x+2,y+2] = 1;
+            PrintScreen(array);
+            return (x + 1, y, false);
+        case 4:
+            if (array[x+3, y] == 1 || array[x+3, y+1] == 1) return (x,y,true);
+                              array[x, y+1] = 0;        //        *
+                              array[x+1, y+1] = 0;      //        *
+            array[x+2,y] = 0; array[x+2,y+1] = 0;       //      * *
+                              array[x+1, y+1] = 1; 
+                              array[x+2, y+1] = 1; 
+            array[x+3,y] = 1; array[x+3,y+1] = 1;
+            PrintScreen(array);
+            return (x + 1, y, false);
+        default:
+            return (x,y,true);
+    }
+}
+
+(int, int, int) TurnRound(int[,] array, int x, int y, int fig)
+{
+    switch (fig)
+    {
+        case 1:
+            //Если при повороте конфликт, то поворачивать нельзя
+            if (array[x+2,y] == 1 || array[x+2,y] == 1) return (x,y,fig); 
+            array[x,y+1] = 1;
+            array[x+1,y+1] = 0;
+            array[x+1,y+2] = 0;
+            array[x+2,y] = 1;
+            PrintScreen(array);
+            return (x, y, fig+1);
+        case 2:
+            if (array[x,y+2] == 1 || array[x+1,y+2] == 1) return (x,y,fig);
+            array[x,y+2] = 1;
+            array[x+1,y] = 0;
+            array[x+1,y+2] = 1;
+            array[x+2,y] = 0;
+            PrintScreen(array);
+            return (x, y, fig+1);
+        case 3:
+            if (array[x+1,y+1] == 1 || array[x+2,y] == 1 || array[x+2,y+1] == 1) return (x,y,fig);
+            array[x,y] = 0; array [x,y+2] = 0;
+            array[x+1,y+1] = 1; array[x+1, y+2] = 0;
+            array[x+2,y] = 1; array[x+2,y+1] = 1;
+            PrintScreen(array);
+            return (x, y, fig+1);
+        case 4:
+            if (array[x,y] == 1 || array[x+1,y] == 1 || array[x+1,y+2] == 1) return (x,y,fig);
+            array[x,y] = 1; array [x,y+1] = 0;
+            array[x+1,y] = 1; array[x+1,y+2] = 1;
+            array[x+2,y] = 0; array[x+2,y+1] = 0;
+            PrintScreen(array);
+            return (x, y, 1);
+        default:
+            return (x,y,fig);
+    }
+    
+}
+
+// Проверка на полную строку.
+void IsFull(int [,] array)
+{
+    for (int i = 0; i < array.GetLength(0)-1; i++) // Перебираем все кроме последней строки
+    {
+        bool flag = true;
+        for (int j = 0; j < array.GetLength(1); j++)
+        {
+            if (array[i,j] == 0) flag = false;  // Если в строке встречается 0, что она не полная
+        }
+        if (flag)   // Если нашли полную строку переписываем все элементы выше этой строки со сдвигом вниз
+        {
+            for (int k = i; k > 1; k--)
+            {
+                for (int j = 0; j < array.GetLength(1); j++)
+                {
+                    array[k, j] = array[k - 1, j];
+                }
+            }
+        }
+    }
+}
+
 Console.Clear();
 
-// Инициализация экрана тетриса. Посленняя строка заполняется 1 - нижняя граница.
-int[,] screen = new int[14,10];
+// Инициализация экрана тетриса.
+int[,] screen = new int[14,13];
 int x, y = 0; // Координаты фигуры (верхняя левая точка)
+int fig = 1; // Фигура номер 1 
+bool flag;
 
+/*
+void TimerCallback(Object o) //TODO обнулять таймер после нажатия кнопки
+   {
+      flag = false;
+      //Console.WriteLine("In TimerCallback: " + DateTime.Now);
+      (x, y, flag) = TurnDown(screen, x, y, fig);
+      if (flag)
+      {
+            IsFull(screen);
+            (screen, x, y, fig) = NewFigure1(screen);
+      }
+   }
+*/
+
+//Периметр единицами
 for (int j = 0; j < screen.GetLength(1); j++)
 {
     screen[screen.GetLength(0) - 1, j] = 1;
+    screen[screen.GetLength(0) - 2, j] = 1;
+    screen[screen.GetLength(0) - 3, j] = 1;
 }
 
+for (int i = 0; i < screen.GetLength(0); i++)
+{
+    screen[i, 0] = 1;
+    screen[i, 1] = 1;
+    screen[i, 2] = 1;
+    screen[i, screen.GetLength(1) - 1] = 1;
+    screen[i, screen.GetLength(1) - 2] = 1;
+    screen[i, screen.GetLength(1) - 3] = 1;
+}
+
+
+
 // Начинаем игру
-(screen, x, y) = NewFigure(screen);
+(screen, x, y, fig) = NewFigure1(screen);
+
+//Timer downTimer = null;
+//downTimer = new Timer(TimerCallback, null, 5000, 2000);
 
 ConsoleKeyInfo key;
 do
 {
+    flag = false;
     key = Console.ReadKey();
+    //downTimer.Dispose();
+    Console.WriteLine(key.Key);
     switch (key.Key)
     {
-        case ConsoleKey.LeftArrow  : (x, y) = TurnLeft(screen, x, y);
+        case ConsoleKey.Spacebar  : (x, y, fig) = TurnRound(screen, x, y, fig);
         break;
-        case ConsoleKey.RightArrow : (x, y) = TurnRight(screen, x, y);
+        case ConsoleKey.LeftArrow  : (x, y) = TurnLeft(screen, x, y, fig);
         break;
-        case ConsoleKey.DownArrow  : (x, y) = TurnDown(screen, x, y);
+        case ConsoleKey.RightArrow : (x, y) = TurnRight(screen, x, y, fig);
+        break;
+        case ConsoleKey.DownArrow  : (x, y, flag) = TurnDown(screen, x, y, fig);
         break;
     }  
 
-    if (screen[x + 1, y] == 1)
+    if (flag)
         {
             IsFull(screen);
-            (screen, x, y) = NewFigure(screen);
+            (screen, x, y, fig) = NewFigure1(screen);
         }
+    //downTimer.Change(0,2000);
 } while (key.Key != ConsoleKey.Escape);
